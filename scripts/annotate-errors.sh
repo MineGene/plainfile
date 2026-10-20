@@ -19,4 +19,11 @@ grep -E '^[^ ]+\.swift:[0-9]+(:[0-9]+)?: error: ' "$log" \
 # Failures without a file location (for example a crashed test run).
 grep -E '^(error: |Test Suite .* failed|.*Fatal error)' "$log" | head -n 10 \
   | while IFS= read -r line; do echo "::error::${line//'%'/'%25'}"; done
+# A crash (e.g. signal 5) prints no error line; name the test that was running.
+if grep -q "unexpected signal" "$log"; then
+  last=$(grep -E "^Test Case '.*' started" "$log" | tail -n 1)
+  [ -n "$last" ] && echo "::error::Crashed during: ${last}"
+  grep -n -E "Fatal error|Assertion failed|Precondition failed|EXC_|Crash" "$log" | head -n 5 \
+    | while IFS= read -r l; do echo "::error::${l//'%'/'%25'}"; done
+fi
 exit 0
