@@ -52,6 +52,11 @@ public enum ImageStripper {
         let count = CGImageSourceGetCount(source)
         guard count == 1 else { throw StripError.multipleImages(count) }
 
+        // ImageIO doesn't remove PNG metadata when copying; drop the chunks instead.
+        if type as String == UTType.png.identifier {
+            return ids.isEmpty ? data : try PNGStripper.strip(data).output
+        }
+
         let metadata: CGMutableImageMetadata =
             CGImageSourceCopyMetadataAtIndex(source, 0, nil)
             .flatMap { CGImageMetadataCreateMutableCopy($0) }

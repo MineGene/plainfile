@@ -118,3 +118,82 @@ final class VerifierTests: XCTestCase {
         XCTAssertTrue(result.passed)
     }
 }
+
+final class FormatTests: XCTestCase {
+    private func assertDefaultStripCleans(_ type: UTType, file: StaticString = #filePath, line: UInt = #line) throws {
+        let input: Data
+        do { input = try TestImages.planted(type) } catch {
+            throw XCTSkip("macOS on this runner can't write \(type.identifier) test images")
+        }
+        let before = try ImageScanner.scan(data: input)
+        guard before.fields.contains(where: { $0.value == TestImages.author }) else {
+            throw XCTSkip("macOS didn't embed the planted author in the test \(type.identifier)")
+        }
+        let removed = Set(before.fields.filter(\.removeByDefault).map(\.id))
+        let output = try ImageStripper.strip(data: input, removing: removed)
+        let after = try ImageScanner.scan(data: output)
+        let result = Verifier.verify(before: before.fields, removed: removed, after: after.fields, output: output)
+        XCTAssertTrue(
+            result.passed, "still present: \(result.stillPresent.map(\.id)), residue: \(result.residue.map(\.id))",
+            file: file, line: line)
+        XCTAssertTrue(try ImageComparator.pixelsMatch(input, output), "pixels changed", file: file, line: line)
+    }
+
+    func testTIFF() throws { try assertDefaultStripCleans(.tiff) }
+    func testHEIC() throws { try assertDefaultStripCleans(.heic) }
+}
+
+final class PNGStripperTests: XCTestCase {
+    /// Builds a chunk with a placeholder CRC (the stripper copies chunks as-is).
+    private func chunk(_ type: String, _ body: Data) -> Data {
+        var d = Data()
+        let n = UInt32(body.count).bigEndian
+        withUnsafeBytes(of: n) { d.append(contentsOf: $0) }
+        d.append(Data(type.utf8))
+        d.append(body)
+        d.append(Data([0, 0, 0, 0]))
+        return d
+    }
+
+    func testDropsMetadataChunksAndKeepsPictureChunksByteForByte() throws {
+        let ihdr = chunk("IHDR", Data(repeating: 1, count: 13))
+        let idat = chunk("IDAT", Data(repeating: 7, count: 40))
+        let icc = chunk("iCCP", Data(repeating: 3, count: 10))
+        var png = PNGStripper.signature
+        png.append(ihdr)
+        png.append(icc)
+        png.append(chunk("tEXt", Data("Author\u{0}Planted Author".utf8)))
+        png.append(chunk("iTXt", Data("XML:com.adobe.xmp".utf8)))
+        png.append(chunk("eXIf", Data(repeating: 9, count: 20)))
+        png.append(chunk("iDOT", Data(repeating: 2, count: 28)))
+        png.append(idat)
+        png.append(chunk("IEND", Data()))
+        png.append(Data("trailer".utf8))
+
+        let (output, dropped) = try PNGStripper.strip(png)
+        var expected = PNGStripper.signature
+        expected.append(ihdr)
+        expected.append(icc)
+        expected.append(idat)
+        expected.append(chunk("IEND", Data()))
+        XCTAssertEqual(output, expected)
+        XCTAssertEqual(dropped, ["tEXt", "iTXt", "eXIf", "iDOT", "trailing data"])
+    }
+
+    func testRejectsTruncatedOrMalformedFiles() {
+        var truncated = PNGStripper.signature
+        truncated.append(chunk("IHDR", Data(repeating: 1, count: 13)).prefix(10))
+        XCTAssertThrowsError(try PNGStripper.strip(truncated))
+
+        var hugeLength = PNGStripper.signature
+        hugeLength.append(Data([0xFF, 0xFF, 0xFF, 0xFF]))
+        hugeLength.append(Data("IHDR".utf8))
+        XCTAssertThrowsError(try PNGStripper.strip(hugeLength))
+
+        var noEnd = PNGStripper.signature
+        noEnd.append(chunk("IHDR", Data(repeating: 1, count: 13)))
+        XCTAssertThrowsError(try PNGStripper.strip(noEnd))
+
+        XCTAssertThrowsError(try PNGStripper.strip(Data("not a png".utf8)))
+    }
+}

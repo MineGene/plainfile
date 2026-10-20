@@ -22,6 +22,12 @@ public enum ImageScanner {
         "PrimaryImage", "FileContentsDictionary",
     ]
 
+    /// PNG properties that describe the picture (from IHDR, gAMA, cHRM, sRGB, pHYs).
+    static let pngStructuralKeys: Set<String> = [
+        "Gamma", "InterlaceType", "sRGBIntent", "Chromaticities",
+        "XPixelsPerMeter", "YPixelsPerMeter", "DisplayPixelsPerInchX", "DisplayPixelsPerInchY",
+    ]
+
     /// XMP namespaces that ImageIO mirrors from EXIF/TIFF; listed once, from EXIF.
     private static let mirroredXMPPrefixes: Set<String> = ["exif", "tiff", "exifEX"]
 
@@ -96,6 +102,11 @@ public enum ImageScanner {
         switch dictionary {
         case "{GPS}":
             return (.location, .critical, true)
+        case "{JFIF}":
+            // Part of the JPEG format itself (density, version); identifies nothing.
+            return (.other, .low, false)
+        case "{PNG}" where pngStructuralKeys.contains(key):
+            return (.other, .low, false)
         case let d? where d.hasPrefix("{Maker"):
             return (.device, .high, true)
         case "{IPTC}":
