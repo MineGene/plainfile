@@ -57,22 +57,35 @@ public enum ImageStripper {
             return ids.isEmpty ? data : try PNGStripper.strip(data).output
         }
 
-        let metadata: CGMutableImageMetadata =
-            CGImageSourceCopyMetadataAtIndex(source, 0, nil)
-            .flatMap { CGImageMetadataCreateMutableCopy($0) }
-            ?? CGImageMetadataCreateMutable()
+        let original = CGImageSourceCopyMetadataAtIndex(source, 0, nil)
+        let paths = Set(
+            ids.flatMap { id in original.map { xmpPaths(forFieldID: id, in: $0) } ?? [] })
 
-        for id in ids {
-            for path in xmpPaths(forFieldID: id, in: metadata) {
+        let metadata: CGMutableImageMetadata
+        let merge: Bool
+        if type as String == UTType.jpeg.identifier {
+            // JPEG: start from the image's own metadata minus the removed tags.
+            // It replaces all EXIF, IPTC and XMP in the copy, so anything not
+            // in it (maker notes, embedded thumbnails) is dropped too.
+            metadata = original.flatMap { CGImageMetadataCreateMutableCopy($0) }
+                ?? CGImageMetadataCreateMutable()
+            for path in paths {
                 CGImageMetadataRemoveTagWithPath(metadata, nil, path as CFString)
             }
+            merge = false
+        } else {
+            // HEIC and TIFF keep their metadata when replaced wholesale, so
+            // each removed tag is deleted explicitly instead (merge + null).
+            metadata = CGImageMetadataCreateMutable()
+            for path in paths {
+                CGImageMetadataSetValueWithPath(metadata, nil, path as CFString, kCFNull)
+            }
+            merge = true
         }
 
-        // The metadata given here replaces all EXIF, IPTC and XMP in the copy,
-        // so anything not in it (maker notes, embedded thumbnails) is dropped.
         var options: [CFString: Any] = [
             kCGImageDestinationMetadata: metadata,
-            kCGImageDestinationMergeMetadata: false,
+            kCGImageDestinationMergeMetadata: merge,
         ]
         if removesAllLocation(ids, in: source) {
             options[kCGImageMetadataShouldExcludeGPS] = true
@@ -94,7 +107,9 @@ public enum ImageStripper {
     /// value), `img0.Orientation` (a top-level property) or `xmp.<path>`.
     static func xmpPaths(forFieldID id: String, in metadata: CGImageMetadata) -> [String] {
         if id.hasPrefix("xmp.") {
-            return [String(id.dropFirst(4))]
+            // An item of a list (e.g. dc:creator[0]) removes the whole list.
+            let path = id.dropFirst(4)
+            return [String(path.prefix { $0 != "[" })]
         }
         guard id.hasPrefix("img") else { return [] }
         let parts = id.split(separator: ".", maxSplits: 2, omittingEmptySubsequences: false)
