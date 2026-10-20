@@ -12,6 +12,10 @@ cd "$(dirname "$0")/.."
 root=$(pwd)
 derived="$root/build/DerivedData"
 export ZERO_AR_DATE=1
+# A fixed temporary folder: the compiler writes generated code (such as
+# macro expansions) there, and a random path would leak into the build.
+export TMPDIR=/tmp/plainfile-build
+rm -rf "$TMPDIR" && mkdir -p "$TMPDIR"
 build_number=$(git rev-list --count HEAD 2>/dev/null || echo 1)
 extra=("CURRENT_PROJECT_VERSION=$build_number")
 if [ -n "${PLAINFILE_VERSION:-}" ]; then
