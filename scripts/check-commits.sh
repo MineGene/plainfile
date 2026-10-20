@@ -2,7 +2,8 @@
 # Fails if any commit in a range would publish private details:
 #   - an author or committer email that isn't a GitHub no-reply address
 #   - a trailer (the "Key: value" lines at the end of a message) other than
-#     the few allowed below, or one that carries a real email address
+#     the few allowed below, or one that carries a real email address.
+# AI attribution (Co-authored-by: Claude <noreply@anthropic.com>) is allowed.
 # Usage: scripts/check-commits.sh <base> <head>
 set -euo pipefail
 
@@ -17,7 +18,9 @@ else
 fi
 
 allowed_email='(^[0-9]+\+[A-Za-z0-9._-]+(\[bot\])?@users\.noreply\.github\.com$)|(^(noreply|support)@github\.com$)'
-allowed_trailers='^(Signed-off-by|Co-authored-by|Fixes|Closes|Resolves|Refs):'
+allowed_trailers='^(Signed-off-by|Co-authored-by|Fixes|Closes|Resolves|Refs|Claude-Session):'
+# Trailer emails may also be the AI tool's own no-reply address.
+allowed_trailer_email="$allowed_email|(^noreply@anthropic\.com\$)"
 
 status=0
 commits=$(git rev-list "$range")
@@ -43,7 +46,7 @@ for sha in $commits; do
       status=1
     elif shopt -u nocasematch && [[ "$trailer" == *"<"*"@"*">"* ]]; then
       email=$(sed -E 's/.*<([^>]+)>.*/\1/' <<<"$trailer")
-      if ! [[ "$email" =~ $allowed_email ]]; then
+      if ! [[ "$email" =~ $allowed_trailer_email ]]; then
         echo "::error::$short has a trailer exposing the email '$email'."
         status=1
       fi
