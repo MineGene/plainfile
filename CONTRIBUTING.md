@@ -12,9 +12,10 @@ Thanks for helping. Plainfile is a privacy tool, so the project holds itself to 
   ```
 
   The address is shown on that settings page.
-- **No attribution or tool trailers** in commit messages. Only `Signed-off-by`, `Co-authored-by` (with a no-reply email), `Fixes`, `Closes`, `Resolves` and `Refs` are allowed.
+- **Say when AI wrote it.** Much of Plainfile is written by Claude through Claude Code, and that's stated openly. If an AI tool wrote or substantially shaped your change, say so in the pull request and add a `Co-authored-by:` line for it.
+- Commit trailers are limited to `Signed-off-by`, `Co-authored-by`, `Fixes`, `Closes`, `Resolves`, `Refs` and `Claude-Session`. Any email in them must be a GitHub no-reply address or `noreply@anthropic.com`.
 
-The *Commit privacy* check enforces the last two on every pull request.
+The *Commit privacy* check enforces the email and trailer rules on every pull request.
 
 ## Workflow
 
@@ -44,6 +45,18 @@ The build uses Xcode only. New Swift files in `Plainfile/` or `PlainfileParser/`
 - Keep build and test tools to a minimum. Any new one needs a stated reason in the pull request, an exact pinned version and a checksum, and must never ship inside the app.
 - Nothing about a user's files is written to disk or logged.
 - GitHub Actions are pinned to full commit SHAs. Dependabot proposes updates after a 7-day cooldown.
+
+## Testing
+
+Because much of the code is written by an AI, no single check is trusted on its own. Each layer is meant to catch what the others miss:
+
+1. **Unit tests on planted data** (done): fake location, camera and author planted in JPEG, PNG and HEIC, removed, then checked by a fresh scan, a raw-byte search and a pixel comparison.
+2. **Verification inside the app** (engine done): every clean is re-scanned, byte-searched and pixel-compared before the original is replaced.
+3. **Independent cross-check** (next): ExifTool and mat2 re-examine every cleaned test file on CI.
+4. **Real-world sample files** (next): openly licensed files from many devices and apps, pinned by checksum. Never personal files.
+5. **Tests for the tests** (next): deliberately broken versions of the cleaner must make the tests fail.
+6. **Corrupted-file testing, sanitizers and a coverage floor** (planned).
+7. **Interface tests** (with the UI) and **the maintainer's check on a real Mac** before each release.
 
 ## Releases
 
