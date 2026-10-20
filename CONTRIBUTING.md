@@ -20,7 +20,7 @@ The *Commit privacy* check enforces the last two on every pull request.
 
 1. Branch from `main`; one change per pull request.
 2. Push and open a pull request. CI builds the app, runs the tests, checks entitlements and commit privacy, and runs CodeQL. Nothing needs a Mac except writing code.
-3. Pull requests are squash-merged by the maintainer.
+3. Pull requests are squash-merged automatically once every required check passes (auto-merge). The maintainer can still review, hold or close any pull request.
 
 `main` is protected: no direct pushes, force pushes or deletions.
 
