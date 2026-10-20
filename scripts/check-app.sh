@@ -32,8 +32,10 @@ check_entitlements() {
   if echo "$ents" | grep -q "com.apple.security.network"; then
     fail "$label has a network entitlement. Plainfile must never have network access."
   fi
-  if echo "$ents" | grep -qE "disable-library-validation|allow-jit|allow-unsigned-executable-memory|get-task-allow"; then
-    fail "$label has a weakening entitlement"
+  local weak
+  weak=$(echo "$ents" | grep -oE "[a-z.-]*(disable-library-validation|allow-jit|allow-unsigned-executable-memory|get-task-allow)" | sort -u | tr '\n' ' ' || true)
+  if [ -n "$weak" ]; then
+    fail "$label has a weakening entitlement: $weak"
   fi
 }
 
