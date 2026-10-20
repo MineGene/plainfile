@@ -117,6 +117,22 @@ final class FilesystemScannerTests: XCTestCase {
         XCTAssertFalse(flag.removeByDefault)
     }
 
+    func testOversizedAttributeIsNotRead() throws {
+        let big = Data(repeating: 0x41, count: FilesystemScanner.maxAttributeBytes + 1)
+        try set(FilesystemScanner.whereFroms, big)
+        XCTAssertNil(FilesystemScanner.attribute(FilesystemScanner.whereFroms, of: fileURL))
+        let fields = FilesystemScanner.scan(fileURL)
+        let source = try XCTUnwrap(fields.first { $0.id == "xattr.\(FilesystemScanner.whereFroms)" })
+        XCTAssertEqual(source.value, "Unreadable")
+    }
+
+    func testUnknownAttributeShowsSizeOnly() throws {
+        try set("com.example.private", Data("secret value".utf8))
+        let fields = FilesystemScanner.scan(fileURL)
+        let field = try XCTUnwrap(fields.first { $0.id == "xattr.com.example.private" })
+        XCTAssertEqual(field.value, "12 bytes")
+    }
+
     func testAlwaysReportsFileName() {
         let fields = FilesystemScanner.scan(fileURL)
         XCTAssertEqual(fields.first { $0.id == "fs.name" }?.value, fileURL.lastPathComponent)

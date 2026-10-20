@@ -1,12 +1,12 @@
 #!/bin/bash
-# Generates the Xcode project and builds a Universal, ad-hoc-signed
+# Generates the Xcode project and builds an Apple-silicon, ad-hoc-signed
 # Release app into build/Release/Plainfile.app. Used by CI and releases;
 # also works on any Mac with Xcode and XcodeGen installed.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-command -v xcodegen >/dev/null || brew install xcodegen
-xcodegen generate
+xcodegen=$(scripts/install-xcodegen.sh)
+"$xcodegen" generate
 
 version="${PLAINFILE_VERSION:-}"
 extra=()
@@ -22,7 +22,7 @@ xcodebuild build \
   -configuration Release \
   -destination 'generic/platform=macOS' \
   -derivedDataPath build/DerivedData \
-  ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+  ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
   ${extra[@]+"${extra[@]}"} \
   > build/xcodebuild.log 2>&1
 status=$?

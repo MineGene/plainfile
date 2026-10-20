@@ -17,4 +17,7 @@ Only the latest release receives fixes. Plainfile can't update itself (it has no
 - The app and its parser service are sandboxed with no network entitlement; CI fails any build that adds one.
 - File contents are parsed only in a separate XPC service with no file-access entitlements.
 - Hardened runtime is enabled; no JIT, unsigned memory or library-validation exceptions.
-- GitHub Actions are pinned to commit SHAs and updated by Dependabot.
+- Parsing has a 30-second time limit per file; a hung parser is cut off rather than blocking the app.
+- File attributes are read only if they are known, and only up to 64 KB.
+- GitHub Actions are pinned to commit SHAs and the build tool to a checksum-verified release; Dependabot updates them after a 7-day cooldown.
+- Releases are built only from commits on `main`, by GitHub Actions, with a public build attestation.

@@ -12,6 +12,15 @@ public enum FilesystemScanner {
     public static let finderInfo = "com.apple.FinderInfo"
     public static let finderComment = "com.apple.metadata:kMDItemFinderComment"
 
+    /// Attributes whose contents are decoded and shown. Every other attribute
+    /// is listed by name and size only, so its contents are never read.
+    static let decodedAttributes: Set<String> = [
+        whereFroms, quarantine, userTags, finderInfo, finderComment,
+    ]
+
+    /// Upper limit on how much of a decoded attribute is read.
+    public static let maxAttributeBytes = 64 * 1024
+
     public static func scan(_ url: URL) -> [MetadataField] {
         var fields: [MetadataField] = []
 
@@ -39,12 +48,14 @@ public enum FilesystemScanner {
         }
 
         for name in attributeNames(url) {
-            fields.append(field(forAttribute: name, data: attribute(name, of: url)))
+            let size = attributeSize(name, of: url) ?? 0
+            let data = decodedAttributes.contains(name) ? attribute(name, of: url) : nil
+            fields.append(field(forAttribute: name, data: data, size: size))
         }
         return fields
     }
 
-    static func field(forAttribute name: String, data: Data?) -> MetadataField {
+    static func field(forAttribute name: String, data: Data?, size: Int) -> MetadataField {
         let id = "xattr.\(name)"
         let source = "File attributes"
         switch name {
@@ -72,11 +83,11 @@ public enum FilesystemScanner {
                 value: decodedStrings(data).joined(separator: " "), source: source, risk: .medium)
         case finderInfo:
             return MetadataField(
-                id: id, group: .other, name: "Finder info", value: "\(data?.count ?? 0) bytes",
+                id: id, group: .other, name: "Finder info", value: "\(size) bytes",
                 source: source, risk: .low)
         default:
             return MetadataField(
-                id: id, group: .other, name: name, value: "\(data?.count ?? 0) bytes",
+                id: id, group: .other, name: name, value: "\(size) bytes",
                 source: source, risk: .low)
         }
     }
@@ -107,11 +118,20 @@ public enum FilesystemScanner {
         }
     }
 
+    public static func attributeSize(_ name: String, of url: URL) -> Int? {
+        url.withUnsafeFileSystemRepresentation { path -> Int? in
+            guard let path else { return nil }
+            let size = getxattr(path, name, nil, 0, 0, XATTR_NOFOLLOW)
+            return size >= 0 ? size : nil
+        }
+    }
+
+    /// Reads an attribute, refusing anything larger than `maxAttributeBytes`.
     public static func attribute(_ name: String, of url: URL) -> Data? {
         url.withUnsafeFileSystemRepresentation { path -> Data? in
             guard let path else { return nil }
             let size = getxattr(path, name, nil, 0, 0, XATTR_NOFOLLOW)
-            guard size >= 0 else { return nil }
+            guard size >= 0, size <= maxAttributeBytes else { return nil }
             var data = Data(count: size)
             let read = data.withUnsafeMutableBytes {
                 getxattr(path, name, $0.baseAddress, size, 0, XATTR_NOFOLLOW)
