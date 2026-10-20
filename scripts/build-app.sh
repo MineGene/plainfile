@@ -30,6 +30,7 @@ xcodebuild build \
   DEPLOYMENT_POSTPROCESSING=YES STRIP_INSTALLED_PRODUCT=YES COPY_PHASE_STRIP=YES \
   COMPILER_INDEX_STORE_ENABLE=NO \
   OTHER_SWIFT_FLAGS="-file-prefix-map $derived=/DerivedData -file-prefix-map $root=/Source" \
+  OTHER_LDFLAGS="-Wl,-oso_prefix,$root/" \
   ${extra[@]+"${extra[@]}"} \
   > build/xcodebuild.log 2>&1
 status=$?
