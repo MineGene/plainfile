@@ -32,6 +32,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Select pinned Xcode
+        run: scripts/select-xcode.sh
 
       - name: Only release from main
         run: |
@@ -62,6 +64,14 @@ jobs:
       - name: Check app
         run: scripts/check-app.sh build/Release/Plainfile.app
 
+      - name: Record app digest
+        id: digest
+        run: |
+          scripts/app-digest.sh build/Release/Plainfile.app > build/Plainfile-app-digest.txt
+          echo "sha=$(shasum -a 256 build/Plainfile-app-digest.txt | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "xcode=$(xcodebuild -version | head -n 1)" >> "$GITHUB_OUTPUT"
+          echo "macos=$(sw_vers -productVersion)" >> "$GITHUB_OUTPUT"
+
       - name: Make DMG
         id: dmg
         env:
@@ -88,8 +98,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NAME: ${{ steps.dmg.outputs.name }}
           VERSION: ${{ steps.version.outputs.version }}
+          APP_DIGEST: ${{ steps.digest.outputs.sha }}
+          XCODE: ${{ steps.digest.outputs.xcode }}
+          MACOS: ${{ steps.digest.outputs.macos }}
         run: |
           sha=$(cut -d' ' -f1 "build/$NAME.sha256")
+          cp build/Plainfile-app-digest.txt "build/Plainfile-$VERSION-app-digest.txt"
           cat > build/notes.md <<EOF
           ## Install
 
@@ -107,10 +121,14 @@ jobs:
           gh attestation verify $NAME --repo $GITHUB_REPOSITORY
           \`\`\`
 
+          ## Rebuild it yourself (optional)
+
+          This release is reproducible: building commit \`$GITHUB_SHA\` with $XCODE gives an app with digest \`$APP_DIGEST\` (built on macOS $MACOS). Compare with \`scripts/app-digest.sh\`; the full file list is attached.
+
           ## Changes
           EOF
           gh release create "v$VERSION" \
-            "build/$NAME" "build/$NAME.sha256" \
+            "build/$NAME" "build/$NAME.sha256" "build/Plainfile-$VERSION-app-digest.txt" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Plainfile $VERSION" \
             --notes-file build/notes.md \

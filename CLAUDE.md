@@ -17,6 +17,7 @@ Plainfile is a native macOS app (Swift, SwiftUI) that shows and removes hidden m
 - Core logic lives in `Packages/PlainfileCore` with XCTest tests. Add tests for every behaviour change, using planted fake data (`TestImages`), never real personal files.
 - The Xcode project uses synchronized folders: new Swift files in `Plainfile/` or `PlainfileParser/` need no project edit.
 - The security scan (Analyze Swift) takes about 17 minutes when code changes; other checks take 1–3.
+- Builds must stay reproducible: Xcode is pinned in `.xcode-version` (selected by `scripts/select-xcode.sh`), and the *Reproducible build* check builds twice at different paths and compares `scripts/app-digest.sh` output. Never add timestamps, absolute paths or run-specific values to the build.
 
 ## Rules the design depends on
 
