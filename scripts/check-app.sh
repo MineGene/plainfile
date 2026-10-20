@@ -18,6 +18,12 @@ for binary in "$app/Contents/MacOS/Plainfile" "$service/Contents/MacOS/Plainfile
   [ "$archs" = "arm64" ] || fail "$binary should be Apple silicon only, found: $archs"
 done
 
+echo "== Icon"
+icon=$(plutil -extract CFBundleIconName raw "$app/Contents/Info.plist" 2>/dev/null || true)
+[ "$icon" = "AppIcon" ] || fail "App icon isn't set (CFBundleIconName is '${icon:-missing}')"
+[ -f "$app/Contents/Resources/AppIcon.icns" ] || fail "App icon fallback (AppIcon.icns) is missing"
+echo "AppIcon present"
+
 echo "== Signature"
 codesign --verify --deep --strict --verbose=2 "$app"
 codesign -d --verbose=2 "$app" 2>&1 | grep -q "flags=.*runtime" || fail "Hardened runtime is not enabled"
