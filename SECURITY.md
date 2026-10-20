@@ -19,5 +19,5 @@ Only the latest release receives fixes. Plainfile can't update itself (it has no
 - Hardened runtime is enabled; no JIT, unsigned memory or library-validation exceptions.
 - Parsing has a 30-second time limit per file; a hung parser is cut off rather than blocking the app.
 - File attributes are read only if they are known, and only up to 64 KB.
-- GitHub Actions are pinned to commit SHAs and the build tool to a checksum-verified release; Dependabot updates them after a 7-day cooldown.
+- The app contains no third-party code and is built with Apple's tools only. GitHub Actions are pinned to commit SHAs; Dependabot updates them after a 7-day cooldown.
 - Releases are built only from commits on `main`, by GitHub Actions, with a public build attestation.

@@ -1,0 +1,511 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A3D7D7A86A375CCBBC531E2 /* PlainfileParser.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = E9E7D7FC44D3E32C81572388 /* PlainfileParser.xpc */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1DC9F17D1653636B2B2667A5 /* PlainfileCore in Frameworks */ = {isa = PBXBuildFile; productRef = 73287E8560B92B9A8A9B74B1 /* PlainfileCore */; };
+		B458B37E128A438DBB636348 /* PlainfileCore in Frameworks */ = {isa = PBXBuildFile; productRef = 50D2FF0DB2D88A55683976AE /* PlainfileCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4DF7175330AEFB1275365FEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A37AD7B463C8F11D85968DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 454F6B77F4A67437AE9C7DB2;
+			remoteInfo = PlainfileParser;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4529F63C99E02BAF1B6D5DA7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				1A3D7D7A86A375CCBBC531E2 /* PlainfileParser.xpc in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0BA497A883E42641085888B2 /* PlainfileCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PlainfileCore; path = Packages/PlainfileCore; sourceTree = SOURCE_ROOT; };
+		581129DDBD2AA8A866F83103 /* Plainfile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plainfile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9E7D7FC44D3E32C81572388 /* PlainfileParser.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = PlainfileParser.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A110AC530B829A35E40E3E4A /* PlainfileParser */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = PlainfileParser;
+			sourceTree = "<group>";
+		};
+		AF7B8B45DAA94170D9D06D5D /* Plainfile */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Plainfile;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1FACD622B7335C7EFA0CF07A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B458B37E128A438DBB636348 /* PlainfileCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		539335E45651B6E9539051B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1DC9F17D1653636B2B2667A5 /* PlainfileCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7BD3E72B8CD83BBFAB356EF3 = {
+			isa = PBXGroup;
+			children = (
+				E5ADEA7AF007633A4894E85D /* Packages */,
+				AF7B8B45DAA94170D9D06D5D /* Plainfile */,
+				A110AC530B829A35E40E3E4A /* PlainfileParser */,
+				D67034DC41108F4B0C7AAE82 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D67034DC41108F4B0C7AAE82 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				581129DDBD2AA8A866F83103 /* Plainfile.app */,
+				E9E7D7FC44D3E32C81572388 /* PlainfileParser.xpc */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E5ADEA7AF007633A4894E85D /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				0BA497A883E42641085888B2 /* PlainfileCore */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		454F6B77F4A67437AE9C7DB2 /* PlainfileParser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4400DA041A166CE26694D577 /* Build configuration list for PBXNativeTarget "PlainfileParser" */;
+			buildPhases = (
+				1C40F5095CDEA5650E42EA5E /* Sources */,
+				6E6D34FEB0698C4CE034271D /* Resources */,
+				1FACD622B7335C7EFA0CF07A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A110AC530B829A35E40E3E4A /* PlainfileParser */,
+			);
+			name = PlainfileParser;
+			packageProductDependencies = (
+				50D2FF0DB2D88A55683976AE /* PlainfileCore */,
+			);
+			productName = PlainfileParser;
+			productReference = E9E7D7FC44D3E32C81572388 /* PlainfileParser.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
+		C6B3FA7B5DD167DE8E638A9C /* Plainfile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0CC6F2C5B703EB528C3871D /* Build configuration list for PBXNativeTarget "Plainfile" */;
+			buildPhases = (
+				CA86AE0ED67374D1D133A67B /* Sources */,
+				33C7D8387E865F21655F4B06 /* Resources */,
+				4529F63C99E02BAF1B6D5DA7 /* CopyFiles */,
+				539335E45651B6E9539051B5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				11041F067518AEE21AC26E05 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AF7B8B45DAA94170D9D06D5D /* Plainfile */,
+			);
+			name = Plainfile;
+			packageProductDependencies = (
+				73287E8560B92B9A8A9B74B1 /* PlainfileCore */,
+			);
+			productName = Plainfile;
+			productReference = 581129DDBD2AA8A866F83103 /* Plainfile.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A37AD7B463C8F11D85968DA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					454F6B77F4A67437AE9C7DB2 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					C6B3FA7B5DD167DE8E638A9C = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = D547CC1959E4C609B967C4B0 /* Build configuration list for PBXProject "Plainfile" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7BD3E72B8CD83BBFAB356EF3;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BAC2B9DEAD6CF38F45735C18 /* XCLocalSwiftPackageReference "Packages/PlainfileCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D67034DC41108F4B0C7AAE82 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C6B3FA7B5DD167DE8E638A9C /* Plainfile */,
+				454F6B77F4A67437AE9C7DB2 /* PlainfileParser */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		33C7D8387E865F21655F4B06 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6E6D34FEB0698C4CE034271D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1C40F5095CDEA5650E42EA5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA86AE0ED67374D1D133A67B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		11041F067518AEE21AC26E05 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 454F6B77F4A67437AE9C7DB2 /* PlainfileParser */;
+			targetProxy = 4DF7175330AEFB1275365FEB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2C08E883795B476321181E1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		9EDA28807ABD651E05DB59D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/PlainfileParser.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minegene.plainfile.parser;
+				PRODUCT_NAME = PlainfileParser;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B284E1E6826C2BF291973DBE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		C09640C665E3F199704ECA6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/Plainfile.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Plainfile;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Plainfile is free software under the MIT License.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minegene.plainfile;
+				PRODUCT_NAME = Plainfile;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C8E0A4A887688C19BF429ECC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/PlainfileParser.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minegene.plainfile.parser;
+				PRODUCT_NAME = PlainfileParser;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FC5C7F0A59E83AE4988409D2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/Plainfile.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Plainfile;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Plainfile is free software under the MIT License.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minegene.plainfile;
+				PRODUCT_NAME = Plainfile;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4400DA041A166CE26694D577 /* Build configuration list for PBXNativeTarget "PlainfileParser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EDA28807ABD651E05DB59D1 /* Debug */,
+				C8E0A4A887688C19BF429ECC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D547CC1959E4C609B967C4B0 /* Build configuration list for PBXProject "Plainfile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C08E883795B476321181E1F /* Debug */,
+				B284E1E6826C2BF291973DBE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E0CC6F2C5B703EB528C3871D /* Build configuration list for PBXNativeTarget "Plainfile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C09640C665E3F199704ECA6F /* Debug */,
+				FC5C7F0A59E83AE4988409D2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		BAC2B9DEAD6CF38F45735C18 /* XCLocalSwiftPackageReference "Packages/PlainfileCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/PlainfileCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		50D2FF0DB2D88A55683976AE /* PlainfileCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PlainfileCore;
+		};
+		73287E8560B92B9A8A9B74B1 /* PlainfileCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PlainfileCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6A37AD7B463C8F11D85968DA /* Project object */;
+}
