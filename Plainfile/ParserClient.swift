@@ -1,16 +1,23 @@
 import Foundation
 import PlainfileCore
 
-/// Talks to the isolated parser service. One connection per job.
+/// Talks to the isolated parser service. One connection per job, and every
+/// job has a time limit: if the parser hangs (for example on a file crafted
+/// to make it loop), the connection is cut and the file is reported as
+/// unreadable instead of blocking the app.
 struct ParserClient: Sendable {
+    static let timeLimit: TimeInterval = 30
+
     enum ClientError: LocalizedError {
         case service(String)
         case badReply
+        case timedOut
 
         var errorDescription: String? {
             switch self {
             case .service(let message): message
-            case .badReply: "The parser returned an unexpected result."
+            case .badReply: "This file could not be read."
+            case .timedOut: "Reading this file took too long, so Plainfile stopped."
             }
         }
     }
@@ -19,12 +26,19 @@ struct ParserClient: Sendable {
         let connection = NSXPCConnection(serviceName: ParserService.name)
         connection.remoteObjectInterface = NSXPCInterface(with: ParserServiceProtocol.self)
         connection.resume()
-        defer { connection.invalidate() }
+        let job = Job(connection)
+        defer { job.finish() }
+
+        let deadline = DispatchWorkItem { job.timeOut() }
+        DispatchQueue.global(qos: .utility).asyncAfter(
+            deadline: .now() + Self.timeLimit, execute: deadline)
+        defer { deadline.cancel() }
 
         return try await withCheckedThrowingContinuation { continuation in
             let once = ResumeOnce(continuation)
-            let proxy = connection.remoteObjectProxyWithErrorHandler { error in
-                once.resume(throwing: error)
+            let proxy = connection.remoteObjectProxyWithErrorHandler { _ in
+                // A crash or a cut connection; never show the raw XPC error.
+                once.resume(throwing: job.timedOut ? ClientError.timedOut : ClientError.badReply)
             }
             guard let service = proxy as? ParserServiceProtocol else {
                 once.resume(throwing: ClientError.badReply)
@@ -41,6 +55,24 @@ struct ParserClient: Sendable {
             }
         }
     }
+}
+
+/// Owns one job's connection so the deadline can cut it from another thread.
+private final class Job: @unchecked Sendable {
+    private let lock = NSLock()
+    private let connection: NSXPCConnection
+    private var didTimeOut = false
+
+    init(_ connection: NSXPCConnection) { self.connection = connection }
+
+    var timedOut: Bool { lock.withLock { didTimeOut } }
+
+    func timeOut() {
+        lock.withLock { didTimeOut = true }
+        connection.invalidate()
+    }
+
+    func finish() { connection.invalidate() }
 }
 
 /// XPC can call both the reply and the error handler; resume only once.

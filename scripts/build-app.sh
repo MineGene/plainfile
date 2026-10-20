@@ -5,8 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-command -v xcodegen >/dev/null || brew install xcodegen
-xcodegen generate
+xcodegen=$(scripts/install-xcodegen.sh)
+"$xcodegen" generate
 
 version="${PLAINFILE_VERSION:-}"
 extra=()

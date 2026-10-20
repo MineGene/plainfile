@@ -55,15 +55,17 @@ Native Swift and SwiftUI, using Apple's own frameworks (ImageIO, and soon AVFoun
 
 Everything is built, tested and released by GitHub Actions — no developer hardware involved:
 
-- **CI** (every push and pull request): core tests, app build, and a check that the app is sandboxed, has no network entitlement, and the parser has no file access.
-- **CodeQL** security analysis on every pull request and weekly.
+- **CI** (every push, every pull request and weekly): core tests, app build, and a check that the app is sandboxed, has no network entitlement, and the parser has no file access.
+- **Commit privacy** check: every commit must use a GitHub no-reply email, with no attribution trailers.
+- **CodeQL** security analysis of the Swift code, and **zizmor** audits of the workflows themselves.
+- **Pinned tools:** every GitHub Action is pinned to an exact commit, and the build tool (XcodeGen) to a checksum-verified release. Dependabot proposes updates after a 7-day cooldown.
 - **Release** (on a `v*` tag, after approval): builds, ad-hoc signs, packages a DMG, attaches a checksum and build attestation, and publishes the release.
 
-To build locally: `brew install xcodegen && scripts/build-app.sh`.
+To build locally on an Apple-silicon Mac with Xcode: `scripts/build-app.sh`.
 
 ## Contributing
 
-Issues and pull requests are welcome. **Never attach personal photos or documents** to an issue — they contain exactly the metadata this project is about. Make a fresh test file instead.
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). **Never attach personal photos or documents** to an issue — they contain exactly the metadata this project is about. Make a fresh test file instead.
 
 ## Roadmap
 
