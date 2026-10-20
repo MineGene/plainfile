@@ -12,6 +12,11 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same pull request replaces an unfinished scan.
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   analyze:
     name: Analyze Swift
@@ -23,13 +28,48 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
+
+      # Pull requests that don't touch anything CodeQL analyses skip the scan
+      # (the check still reports success). Main and the weekly run always scan.
+      - name: Check for code changes
+        id: changes
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='\.swift$|^Packages/|^Plainfile\.xcodeproj/|^Config/|^\.github/workflows/codeql\.yml$'
+          if git diff --name-only "$BASE...$HEAD" | grep -qE "$pattern"; then
+            echo "scan=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "scan=false" >> "$GITHUB_OUTPUT"
+            echo "No code changes in this pull request; CodeQL scan skipped."
+          fi
+
       - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        if: steps.changes.outputs.scan != 'false'
         with:
           languages: swift
           build-mode: manual
-      - name: Build
-        run: scripts/build-app.sh
+
+      # CodeQL reads the source, so an unoptimised, unsigned debug build gives
+      # the same results as a release build and compiles far faster.
+      - name: Build (debug, for analysis)
+        if: steps.changes.outputs.scan != 'false'
+        run: |
+          xcodebuild build \
+            -project Plainfile.xcodeproj \
+            -scheme Plainfile \
+            -configuration Debug \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build/CodeQL \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            -quiet
+
       - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        if: steps.changes.outputs.scan != 'false'
         with:
           category: "/language:swift"
