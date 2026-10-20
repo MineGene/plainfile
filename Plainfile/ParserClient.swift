@@ -16,7 +16,7 @@ struct ParserClient: Sendable {
         var errorDescription: String? {
             switch self {
             case .service(let message): message
-            case .badReply: "This file could not be read."
+            case .badReply: "Plainfile's file reader stopped unexpectedly while reading this file."
             case .timedOut: "Reading this file took too long, so Plainfile stopped."
             }
         }
