@@ -27,6 +27,7 @@ set -e
 grep -E "warning:|error:|BUILD (SUCCEEDED|FAILED)" build/xcodebuild.log || true
 if [ "$status" -ne 0 ]; then
   tail -n 80 build/xcodebuild.log
+  scripts/annotate-errors.sh build/xcodebuild.log
   echo "::error::xcodebuild failed"
   exit 1
 fi

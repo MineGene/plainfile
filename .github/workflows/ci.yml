@@ -49,7 +49,12 @@ jobs:
       - name: Toolchain
         run: xcodebuild -version && swift --version
       - name: Run tests
-        run: swift test --package-path Packages/PlainfileCore
+        run: |
+          set +e
+          swift test --package-path Packages/PlainfileCore 2>&1 | tee test.log
+          status=${PIPESTATUS[0]}
+          scripts/annotate-errors.sh test.log
+          exit "$status"
 
   build-app:
     name: Build and check app

@@ -36,14 +36,14 @@ public enum FilesystemScanner {
                     MetadataField(
                         id: "fs.created", group: .dates, name: "Created",
                         value: ValueFormatter.string(created), source: "File system",
-                        risk: .low, removeByDefault: false))
+                        risk: .low, removeByDefault: false, literal: false))
             }
             if let modified = values.contentModificationDate {
                 fields.append(
                     MetadataField(
                         id: "fs.modified", group: .dates, name: "Modified",
                         value: ValueFormatter.string(modified), source: "File system",
-                        risk: .low, removeByDefault: false))
+                        risk: .low, removeByDefault: false, literal: false))
             }
         }
 

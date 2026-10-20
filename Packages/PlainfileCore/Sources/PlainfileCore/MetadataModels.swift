@@ -55,10 +55,13 @@ public struct MetadataField: Codable, Sendable, Identifiable, Hashable {
     /// Whether removing it is offered by default. Orientation, colour profiles,
     /// Content Credentials and the quarantine flag are kept by default.
     public var removeByDefault: Bool
+    /// True when `value` is the stored text itself (not a description such as
+    /// "12 bytes"), so verification can search the cleaned file for it.
+    public var literal: Bool
 
     public init(
         id: String, group: MetadataGroup, name: String, value: String,
-        source: String, risk: Risk, removeByDefault: Bool = true
+        source: String, risk: Risk, removeByDefault: Bool = true, literal: Bool = true
     ) {
         self.id = id
         self.group = group
@@ -67,6 +70,7 @@ public struct MetadataField: Codable, Sendable, Identifiable, Hashable {
         self.source = source
         self.risk = risk
         self.removeByDefault = removeByDefault
+        self.literal = literal
     }
 }
 

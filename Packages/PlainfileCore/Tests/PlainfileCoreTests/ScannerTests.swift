@@ -7,41 +7,8 @@ import XCTest
 @testable import PlainfileCore
 
 final class ImageScannerTests: XCTestCase {
-    /// Makes a small JPEG carrying planted GPS, camera and author values.
-    private func plantedJPEG() throws -> Data {
-        let context = try XCTUnwrap(
-            CGContext(
-                data: nil, width: 8, height: 8, bitsPerComponent: 8, bytesPerRow: 0,
-                space: CGColorSpace(name: CGColorSpace.sRGB)!,
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
-        context.setFillColor(CGColor(red: 0.2, green: 0.4, blue: 0.6, alpha: 1))
-        context.fill(CGRect(x: 0, y: 0, width: 8, height: 8))
-        let image = try XCTUnwrap(context.makeImage())
-
-        let output = NSMutableData()
-        let destination = try XCTUnwrap(
-            CGImageDestinationCreateWithData(output, UTType.jpeg.identifier as CFString, 1, nil))
-        let properties: [String: Any] = [
-            kCGImagePropertyGPSDictionary as String: [
-                kCGImagePropertyGPSLatitude as String: 26.6181,
-                kCGImagePropertyGPSLatitudeRef as String: "S",
-                kCGImagePropertyGPSLongitude as String: 153.0868,
-                kCGImagePropertyGPSLongitudeRef as String: "E",
-            ] as [String: Any],
-            kCGImagePropertyTIFFDictionary as String: [
-                kCGImagePropertyTIFFMake as String: "PlantedCam",
-                kCGImagePropertyTIFFModel as String: "Model Z",
-                kCGImagePropertyTIFFArtist as String: "Planted Author",
-            ] as [String: Any],
-            kCGImagePropertyOrientation as String: 1,
-        ]
-        CGImageDestinationAddImage(destination, image, properties as CFDictionary)
-        XCTAssertTrue(CGImageDestinationFinalize(destination))
-        return output as Data
-    }
-
     func testFindsPlantedLocationDeviceAndAuthor() throws {
-        let report = try ImageScanner.scan(data: plantedJPEG())
+        let report = try ImageScanner.scan(data: TestImages.planted(.jpeg))
 
         XCTAssertEqual(report.typeIdentifier, UTType.jpeg.identifier)
         XCTAssertEqual(report.imageCount, 1)
@@ -58,7 +25,7 @@ final class ImageScannerTests: XCTestCase {
     }
 
     func testOrientationIsKeptByDefault() throws {
-        let report = try ImageScanner.scan(data: plantedJPEG())
+        let report = try ImageScanner.scan(data: TestImages.planted(.jpeg))
         let orientation = report.fields.filter { $0.name.hasSuffix("Orientation") }
         XCTAssertFalse(orientation.isEmpty)
         XCTAssertTrue(orientation.allSatisfy { !$0.removeByDefault })

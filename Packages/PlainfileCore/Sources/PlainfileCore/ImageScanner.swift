@@ -22,6 +22,20 @@ public enum ImageScanner {
         "PrimaryImage", "FileContentsDictionary",
     ]
 
+    /// Lower-cased property names that describe how pixels are stored.
+    static let storageKeys: Set<String> = [
+        "compression", "photometricinterpretation", "resolutionunit", "xresolution", "yresolution",
+        "tilelength", "tilewidth", "headroom", "bitspersample", "samplesperpixel",
+        "planarconfiguration", "rowsperstrip", "hasxmp", "pixelxdimension", "pixelydimension",
+        "exifversion", "flashpixversion", "componentsconfiguration",
+    ]
+
+    /// PNG properties that describe the picture (from IHDR, gAMA, cHRM, sRGB, pHYs).
+    static let pngStructuralKeys: Set<String> = [
+        "Gamma", "InterlaceType", "sRGBIntent", "Chromaticities",
+        "XPixelsPerMeter", "YPixelsPerMeter", "DisplayPixelsPerInchX", "DisplayPixelsPerInchY",
+    ]
+
     /// XMP namespaces that ImageIO mirrors from EXIF/TIFF; listed once, from EXIF.
     private static let mirroredXMPPrefixes: Set<String> = ["exif", "tiff", "exifEX"]
 
@@ -70,7 +84,8 @@ public enum ImageScanner {
                             id: "\(idPrefix).\(key).\(innerKey)", group: group,
                             name: labelPrefix + readable(innerKey),
                             value: ValueFormatter.string(innerValue),
-                            source: source, risk: risk, removeByDefault: removeByDefault))
+                            source: source, risk: risk, removeByDefault: removeByDefault,
+                            literal: innerValue is String))
                 }
             } else if !structuralKeys.contains(key) {
                 let (group, risk, removeByDefault) = classify(dictionary: nil, key: key)
@@ -78,7 +93,7 @@ public enum ImageScanner {
                     MetadataField(
                         id: "\(idPrefix).\(key)", group: group, name: labelPrefix + readable(key),
                         value: ValueFormatter.string(value), source: "Image",
-                        risk: risk, removeByDefault: removeByDefault))
+                        risk: risk, removeByDefault: removeByDefault, literal: value is String))
             }
         }
         return result
@@ -95,6 +110,11 @@ public enum ImageScanner {
         switch dictionary {
         case "{GPS}":
             return (.location, .critical, true)
+        case "{JFIF}":
+            // Part of the JPEG format itself (density, version); identifies nothing.
+            return (.other, .low, false)
+        case "{PNG}" where pngStructuralKeys.contains(key):
+            return (.other, .low, false)
         case let d? where d.hasPrefix("{Maker"):
             return (.device, .high, true)
         case "{IPTC}":
@@ -109,6 +129,10 @@ public enum ImageScanner {
             break
         }
         if k == "orientation" { return (.other, .low, false) }
+        // How the picture is stored; identifies nothing.
+        if storageKeys.contains(k) { return (.other, .low, false) }
+        // Removing the colour space or gamma can change how colours display.
+        if k == "colorspace" || k == "gamma" { return (.other, .low, false) }
         if k == "profilename" { return (.other, .low, false) }
         if k.contains("serial") || k == "hostcomputer" || k == "make" || k == "model"
             || k.contains("lens")
@@ -148,14 +172,15 @@ public enum ImageScanner {
             guard type != .arrayUnordered, type != .arrayOrdered, type != .alternateArray,
                 type != .structure, type != .alternateText
             else { return true }
-            let value = CGImageMetadataTagCopyValue(tag).map { ValueFormatter.string($0) } ?? ""
+            let raw = CGImageMetadataTagCopyValue(tag)
+            let value = raw.map { ValueFormatter.string($0) } ?? ""
             let name = CGImageMetadataTagCopyName(tag) as String? ?? (path as String)
             let (group, risk, removeByDefault) = ImageScanner.classify(dictionary: nil, key: name)
             collector.fields.append(
                 MetadataField(
                     id: "xmp.\(path as String)", group: group, name: "\(prefix):\(name)",
                     value: value, source: "XMP", risk: max(risk, .medium),
-                    removeByDefault: removeByDefault))
+                    removeByDefault: removeByDefault, literal: (raw as? String) != nil))
             return true
         }
         return collector.fields
