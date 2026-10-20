@@ -23,6 +23,50 @@ struct ParserClient: Sendable {
     }
 
     func scanImage(_ data: Data) async throws -> ScanReport {
+        try await run { service, once in
+            service.scanImage(data) { json, message in
+                if let message {
+                    once.resume(throwing: ClientError.service(message))
+                } else if let json, let report = try? JSONDecoder().decode(ScanReport.self, from: json) {
+                    once.resume(returning: report)
+                } else {
+                    once.resume(throwing: ClientError.badReply)
+                }
+            }
+        }
+    }
+
+    func stripImage(_ data: Data, removing ids: Set<String>) async throws -> Data {
+        try await run { service, once in
+            service.stripImage(data, removing: Array(ids)) { output, message in
+                if let message {
+                    once.resume(throwing: ClientError.service(message))
+                } else if let output {
+                    once.resume(returning: output)
+                } else {
+                    once.resume(throwing: ClientError.badReply)
+                }
+            }
+        }
+    }
+
+    func imagesMatch(_ original: Data, _ stripped: Data) async throws -> Bool {
+        try await run { service, once in
+            service.imagesMatch(original, stripped) { match, message in
+                if let message {
+                    once.resume(throwing: ClientError.service(message))
+                } else {
+                    once.resume(returning: match)
+                }
+            }
+        }
+    }
+
+    /// Opens a fresh connection for one call, enforces the time limit, and
+    /// turns a crash or cut connection into a plain error.
+    private func run<T: Sendable>(
+        _ call: (ParserServiceProtocol, ResumeOnce<T>) -> Void
+    ) async throws -> T {
         let connection = NSXPCConnection(serviceName: ParserService.name)
         connection.remoteObjectInterface = NSXPCInterface(with: ParserServiceProtocol.self)
         connection.resume()
@@ -44,15 +88,7 @@ struct ParserClient: Sendable {
                 once.resume(throwing: ClientError.badReply)
                 return
             }
-            service.scanImage(data) { json, message in
-                if let message {
-                    once.resume(throwing: ClientError.service(message))
-                } else if let json, let report = try? JSONDecoder().decode(ScanReport.self, from: json) {
-                    once.resume(returning: report)
-                } else {
-                    once.resume(throwing: ClientError.badReply)
-                }
-            }
+            call(service, once)
         }
     }
 }
@@ -76,19 +112,19 @@ private final class Job: @unchecked Sendable {
 }
 
 /// XPC can call both the reply and the error handler; resume only once.
-private final class ResumeOnce: @unchecked Sendable {
+final class ResumeOnce<T: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
-    private var continuation: CheckedContinuation<ScanReport, Error>?
+    private var continuation: CheckedContinuation<T, Error>?
 
-    init(_ continuation: CheckedContinuation<ScanReport, Error>) { self.continuation = continuation }
+    init(_ continuation: CheckedContinuation<T, Error>) { self.continuation = continuation }
 
-    private func take() -> CheckedContinuation<ScanReport, Error>? {
+    private func take() -> CheckedContinuation<T, Error>? {
         lock.withLock {
             defer { continuation = nil }
             return continuation
         }
     }
 
-    func resume(returning value: ScanReport) { take()?.resume(returning: value) }
+    func resume(returning value: T) { take()?.resume(returning: value) }
     func resume(throwing error: Error) { take()?.resume(throwing: error) }
 }

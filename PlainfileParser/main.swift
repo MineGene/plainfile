@@ -14,6 +14,28 @@ final class ParserServiceImplementation: NSObject, ParserServiceProtocol {
             reply(nil, "This file could not be read.")
         }
     }
+
+    func stripImage(
+        _ data: Data, removing ids: [String], reply: @escaping @Sendable (Data?, String?) -> Void
+    ) {
+        do {
+            reply(try ImageStripper.strip(data: data, removing: Set(ids)), nil)
+        } catch let error as StripError {
+            reply(nil, error.description)
+        } catch {
+            reply(nil, "This file could not be cleaned. Nothing was changed.")
+        }
+    }
+
+    func imagesMatch(
+        _ original: Data, _ stripped: Data, reply: @escaping @Sendable (Bool, String?) -> Void
+    ) {
+        do {
+            reply(try ImageComparator.pixelsMatch(original, stripped), nil)
+        } catch {
+            reply(false, "The cleaned image could not be read back.")
+        }
+    }
 }
 
 final class ServiceDelegate: NSObject, NSXPCListenerDelegate {

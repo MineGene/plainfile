@@ -70,7 +70,8 @@ public enum ImageScanner {
                             id: "\(idPrefix).\(key).\(innerKey)", group: group,
                             name: labelPrefix + readable(innerKey),
                             value: ValueFormatter.string(innerValue),
-                            source: source, risk: risk, removeByDefault: removeByDefault))
+                            source: source, risk: risk, removeByDefault: removeByDefault,
+                            literal: innerValue is String))
                 }
             } else if !structuralKeys.contains(key) {
                 let (group, risk, removeByDefault) = classify(dictionary: nil, key: key)
@@ -78,7 +79,7 @@ public enum ImageScanner {
                     MetadataField(
                         id: "\(idPrefix).\(key)", group: group, name: labelPrefix + readable(key),
                         value: ValueFormatter.string(value), source: "Image",
-                        risk: risk, removeByDefault: removeByDefault))
+                        risk: risk, removeByDefault: removeByDefault, literal: value is String))
             }
         }
         return result
@@ -109,6 +110,8 @@ public enum ImageScanner {
             break
         }
         if k == "orientation" { return (.other, .low, false) }
+        // Removing the colour space or gamma can change how colours display.
+        if k == "colorspace" || k == "gamma" { return (.other, .low, false) }
         if k == "profilename" { return (.other, .low, false) }
         if k.contains("serial") || k == "hostcomputer" || k == "make" || k == "model"
             || k.contains("lens")
@@ -148,14 +151,15 @@ public enum ImageScanner {
             guard type != .arrayUnordered, type != .arrayOrdered, type != .alternateArray,
                 type != .structure, type != .alternateText
             else { return true }
-            let value = CGImageMetadataTagCopyValue(tag).map { ValueFormatter.string($0) } ?? ""
+            let raw = CGImageMetadataTagCopyValue(tag)
+            let value = raw.map { ValueFormatter.string($0) } ?? ""
             let name = CGImageMetadataTagCopyName(tag) as String? ?? (path as String)
             let (group, risk, removeByDefault) = ImageScanner.classify(dictionary: nil, key: name)
             collector.fields.append(
                 MetadataField(
                     id: "xmp.\(path as String)", group: group, name: "\(prefix):\(name)",
                     value: value, source: "XMP", risk: max(risk, .medium),
-                    removeByDefault: removeByDefault))
+                    removeByDefault: removeByDefault, literal: (raw as? String) != nil))
             return true
         }
         return collector.fields
