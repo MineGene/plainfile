@@ -7,6 +7,7 @@ Plainfile is a native macOS app (Swift, SwiftUI) that shows and removes hidden m
 - Commit as the maintainer, with the no-reply address: `git config user.name MineGene` and `git config user.email 187925417+MineGene@users.noreply.github.com`.
 - End each commit message with the standard `Co-Authored-By: Claude <noreply@anthropic.com>` attribution. Don't hide AI involvement anywhere.
 - Turn off this environment's commit signing for the repo (`git config commit.gpgsign false`): its key isn't linked to the maintainer's account, so GitHub shows "Unverified". Squash-merge commits are signed by GitHub.
+- Stage files by name (`git add path/to/file`). Never use `git add -A`, `git add .` or `git commit -a`, and switch branches only with a clean working tree (`git status --short` empty): stray drafts have been swept into unrelated commits this way.
 - Run `scripts/check-commits.sh origin/main HEAD` before pushing.
 - One change per branch and pull request. Open the pull request yourself, then enable auto-merge (squash). Required checks: Commit privacy, Core tests (macos-26), Build and check app, Analyze Swift.
 - Never push to `main` or force-push it; it is protected.
