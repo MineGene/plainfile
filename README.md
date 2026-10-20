@@ -51,14 +51,15 @@ Native Swift and SwiftUI, using Apple's own frameworks (ImageIO, and soon AVFoun
 - `Plainfile/` — the app (SwiftUI window, file handling)
 - `PlainfileParser/` — the isolated parser service (XPC)
 - `Packages/PlainfileCore/` — scanners and models shared by both, with tests
-- `project.yml` — Xcode project definition for [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- `Config/` — entitlements (sandbox permissions) for the app and the parser
+- `Plainfile.xcodeproj` — the Xcode project; new Swift files in `Plainfile/` or `PlainfileParser/` are picked up automatically
 
 Everything is built, tested and released by GitHub Actions — no developer hardware involved:
 
 - **CI** (every push, every pull request and weekly): core tests, app build, and a check that the app is sandboxed, has no network entitlement, and the parser has no file access.
 - **Commit privacy** check: every commit must use a GitHub no-reply email, with no attribution trailers.
 - **CodeQL** security analysis of the Swift code, and **zizmor** audits of the workflows themselves.
-- **Pinned tools:** every GitHub Action is pinned to an exact commit, and the build tool (XcodeGen) to a checksum-verified release. Dependabot proposes updates after a 7-day cooldown.
+- **Minimal dependencies:** the app contains no third-party code, and it's built with Apple's tools only. Every GitHub Action is pinned to an exact commit; Dependabot proposes updates after a 7-day cooldown.
 - **Release** (started with one tap from the Actions tab, after approval): builds, ad-hoc signs, packages a DMG, attaches a checksum and build attestation, and publishes the release.
 
 To build locally on an Apple-silicon Mac with Xcode: `scripts/build-app.sh`.

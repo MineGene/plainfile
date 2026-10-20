@@ -1,12 +1,9 @@
 #!/bin/bash
-# Generates the Xcode project and builds an Apple-silicon, ad-hoc-signed
-# Release app into build/Release/Plainfile.app. Used by CI and releases;
-# also works on any Mac with Xcode and XcodeGen installed.
+# Builds an Apple-silicon, ad-hoc-signed Release app into
+# build/Release/Plainfile.app using only Xcode. Used by CI and releases;
+# also works on any Apple-silicon Mac with Xcode installed.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-
-xcodegen=$(scripts/install-xcodegen.sh)
-"$xcodegen" generate
 
 version="${PLAINFILE_VERSION:-}"
 extra=()

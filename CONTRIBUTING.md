@@ -34,7 +34,7 @@ scripts/check-app.sh build/Release/Plainfile.app
 swift test --package-path Packages/PlainfileCore
 ```
 
-The build uses a pinned, checksum-verified XcodeGen (`scripts/install-xcodegen.sh`); don't replace it with a Homebrew install.
+The build uses Xcode only. New Swift files in `Plainfile/` or `PlainfileParser/` are added to the project automatically; entitlements live in `Config/`.
 
 ## Rules the code must keep
 
