@@ -1,0 +1,73 @@
+# Xcode project definition. The .xcodeproj is generated from this file by
+# XcodeGen (https://github.com/yonaskolb/XcodeGen) and is not committed.
+#   brew install xcodegen && xcodegen generate
+name: Plainfile
+options:
+  bundleIdPrefix: com.minegene
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    # Ad-hoc signing: no Apple Developer account, no notarisation.
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+
+packages:
+  PlainfileCore:
+    path: Packages/PlainfileCore
+
+targets:
+  Plainfile:
+    type: application
+    platform: macOS
+    sources:
+      - Plainfile
+    dependencies:
+      - package: PlainfileCore
+      - target: PlainfileParser
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.minegene.plainfile
+        PRODUCT_NAME: Plainfile
+        CODE_SIGN_ENTITLEMENTS: Plainfile/Plainfile.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Plainfile
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Plainfile is free software under the MIT License."
+
+  PlainfileParser:
+    type: xpc-service
+    platform: macOS
+    sources:
+      - PlainfileParser
+    dependencies:
+      - package: PlainfileCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.minegene.plainfile.parser
+        PRODUCT_NAME: PlainfileParser
+        CODE_SIGN_ENTITLEMENTS: PlainfileParser/PlainfileParser.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Plainfile:
+    build:
+      targets:
+        Plainfile: all
+    run:
+      config: Debug
+    archive:
+      config: Release

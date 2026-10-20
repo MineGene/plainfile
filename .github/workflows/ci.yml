@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Read-only token; no secrets are used anywhere in CI, so fork PRs are safe.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-tests:
+    name: Core tests (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-26, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: xcodebuild -version && swift --version
+      - name: Run tests
+        run: swift test --package-path Packages/PlainfileCore
+
+  build-app:
+    name: Build and check app
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build Universal app
+        run: scripts/build-app.sh
+      - name: Check structure, signature and entitlements
+        run: scripts/check-app.sh build/Release/Plainfile.app
+      - name: Lint (advisory)
+        run: xcrun swift-format lint --recursive Plainfile PlainfileParser Packages/PlainfileCore/Sources || true
