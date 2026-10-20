@@ -1,0 +1,18 @@
+name: File type request
+description: Ask for a file type or kind of metadata to be supported
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: "**Please don't attach personal files.** Describe the file type and where it comes from."
+  - type: input
+    id: format
+    attributes:
+      label: File type
+      placeholder: "e.g. .cr3 RAW from a Canon R6, .epub"
+    validations:
+      required: true
+  - type: textarea
+    id: metadata
+    attributes:
+      label: What hidden information does it carry that you'd like to see or remove?
