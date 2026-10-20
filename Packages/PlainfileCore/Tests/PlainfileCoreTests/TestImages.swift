@@ -47,7 +47,9 @@ enum TestImages {
         for _ in 0..<imageCount {
             CGImageDestinationAddImage(destination, image, properties as CFDictionary)
         }
-        XCTAssertTrue(CGImageDestinationFinalize(destination))
+        guard CGImageDestinationFinalize(destination) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
         return output as Data
     }
 }
