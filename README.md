@@ -30,7 +30,7 @@ shasum -a 256 Plainfile-x.y.z.dmg
 gh attestation verify Plainfile-x.y.z.dmg --repo MineGene/plainfile
 ```
 
-Requires macOS 15 or later, on Apple silicon or Intel.
+Requires macOS 15 or later on a Mac with Apple silicon (M1 or later). Intel Macs are not supported.
 
 **Updates:** Plainfile never checks for updates, because it can't go online. Click **Watch › Custom › Releases** on this page to be told about new versions.
 
@@ -55,7 +55,7 @@ Native Swift and SwiftUI, using Apple's own frameworks (ImageIO, and soon AVFoun
 
 Everything is built, tested and released by GitHub Actions — no developer hardware involved:
 
-- **CI** (every push and pull request): core tests on Apple silicon and Intel, Universal app build, and a check that the app is sandboxed, has no network entitlement, and the parser has no file access.
+- **CI** (every push and pull request): core tests, app build, and a check that the app is sandboxed, has no network entitlement, and the parser has no file access.
 - **CodeQL** security analysis on every pull request and weekly.
 - **Release** (on a `v*` tag, after approval): builds, ad-hoc signs, packages a DMG, attaches a checksum and build attestation, and publishes the release.
 

@@ -16,6 +16,8 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
     MACOSX_DEPLOYMENT_TARGET: "15.0"
+    # Apple silicon only.
+    ARCHS: arm64
     # Ad-hoc signing: no Apple Developer account, no notarisation.
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGN_STYLE: Manual
