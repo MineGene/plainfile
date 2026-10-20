@@ -1,0 +1,99 @@
+name: Release
+
+# Push a tag like v0.1.0 on main. The job then waits for approval on the
+# protected "release" environment before building and publishing.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 45
+    environment: release
+    permissions:
+      contents: write # create the GitHub Release
+      id-token: write # sign the provenance attestation
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read version from tag
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Tag must look like v1.2.3"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Test core
+        run: swift test --package-path Packages/PlainfileCore
+
+      - name: Build Universal app
+        env:
+          PLAINFILE_VERSION: ${{ steps.version.outputs.version }}
+        run: scripts/build-app.sh
+
+      - name: Check app
+        run: scripts/check-app.sh build/Release/Plainfile.app
+
+      - name: Make DMG
+        id: dmg
+        run: |
+          name="Plainfile-${{ steps.version.outputs.version }}.dmg"
+          staging=build/dmg
+          rm -rf "$staging" && mkdir -p "$staging"
+          ditto build/Release/Plainfile.app "$staging/Plainfile.app"
+          ln -s /Applications "$staging/Applications"
+          cp LICENSE "$staging/LICENSE.txt"
+          hdiutil create -volname Plainfile -srcfolder "$staging" -fs HFS+ -format UDZO -ov "build/$name"
+          (cd build && shasum -a 256 "$name" > "$name.sha256")
+          cat "build/$name.sha256"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: build/${{ steps.dmg.outputs.name }}
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ steps.dmg.outputs.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          sha=$(cut -d' ' -f1 "build/$NAME.sha256")
+          cat > build/notes.md <<EOF
+          ## Install
+
+          1. Download **$NAME** below, open it and drag Plainfile to Applications.
+          2. Open Plainfile. macOS will say it can't verify the developer — Plainfile is free and not notarised by Apple.
+          3. Open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**, then confirm. Needed once per version.
+
+          Only download Plainfile from this Releases page.
+
+          ## Verify your download (optional)
+
+          \`\`\`
+          shasum -a 256 $NAME
+          # should print: $sha
+          gh attestation verify $NAME --repo $GITHUB_REPOSITORY
+          \`\`\`
+
+          ## Changes
+          EOF
+          gh release create "$GITHUB_REF_NAME" \
+            "build/$NAME" "build/$NAME.sha256" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Plainfile $VERSION" \
+            --notes-file build/notes.md \
+            --generate-notes \
+            --verify-tag
