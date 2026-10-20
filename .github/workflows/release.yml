@@ -37,7 +37,7 @@ jobs:
       - name: Test core
         run: swift test --package-path Packages/PlainfileCore
 
-      - name: Build Universal app
+      - name: Build app
         env:
           PLAINFILE_VERSION: ${{ steps.version.outputs.version }}
         run: scripts/build-app.sh

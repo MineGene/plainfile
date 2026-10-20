@@ -15,7 +15,7 @@ echo "== Architectures"
 for binary in "$app/Contents/MacOS/Plainfile" "$service/Contents/MacOS/PlainfileParser"; do
   archs=$(lipo -archs "$binary")
   echo "$binary: $archs"
-  [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || fail "$binary is not Universal ($archs)"
+  [ "$archs" = "arm64" ] || fail "$binary should be Apple silicon only, found: $archs"
 done
 
 echo "== Signature"
