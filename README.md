@@ -59,7 +59,7 @@ Everything is built, tested and released by GitHub Actions — no developer hard
 - **Commit privacy** check: every commit must use a GitHub no-reply email, with no attribution trailers.
 - **CodeQL** security analysis of the Swift code, and **zizmor** audits of the workflows themselves.
 - **Pinned tools:** every GitHub Action is pinned to an exact commit, and the build tool (XcodeGen) to a checksum-verified release. Dependabot proposes updates after a 7-day cooldown.
-- **Release** (on a `v*` tag, after approval): builds, ad-hoc signs, packages a DMG, attaches a checksum and build attestation, and publishes the release.
+- **Release** (started with one tap from the Actions tab, after approval): builds, ad-hoc signs, packages a DMG, attaches a checksum and build attestation, and publishes the release.
 
 To build locally on an Apple-silicon Mac with Xcode: `scripts/build-app.sh`.
 

@@ -46,4 +46,4 @@ The build uses a pinned, checksum-verified XcodeGen (`scripts/install-xcodegen.s
 
 ## Releases
 
-Push a tag like `v0.2.0` on a commit that is on `main`. The release workflow waits for the maintainer's approval, then builds, packages and publishes the DMG with its checksum and build attestation.
+In the Actions tab, open **Release › Run workflow**, keep the branch on `main`, and enter the new version (for example `0.2.0`). The run waits for the maintainer's approval, then builds `main`, creates the `v0.2.0` tag and publishes the DMG with its checksum and build attestation.

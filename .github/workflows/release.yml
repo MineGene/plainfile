@@ -1,10 +1,15 @@
 name: Release
 
-# Push a tag like v0.1.0 on main. The job then waits for approval on the
-# protected "release" environment before building and publishing.
+# Start from the Actions tab (works from a phone): Release › Run workflow,
+# enter a version like 0.2.0. The job waits for approval on the protected
+# "release" environment, then builds main, tags it and publishes the release.
 on:
-  push:
-    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 0.2.0"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -28,16 +33,22 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Only release commits that are on main
+      - name: Only release from main
         run: |
-          git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
-            || { echo "::error::Tag $GITHUB_REF_NAME points at a commit that is not on main."; exit 1; }
+          [ "$GITHUB_REF" = "refs/heads/main" ] \
+            || { echo "::error::Run the release from the main branch."; exit 1; }
 
-      - name: Read version from tag
+      - name: Check version
         id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Tag must look like v1.2.3"; exit 1; }
+          version="${INPUT_VERSION#v}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+            || { echo "::error::Version must look like 1.2.3"; exit 1; }
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "::error::v$version has already been released."; exit 1
+          fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Test core
@@ -98,10 +109,10 @@ jobs:
 
           ## Changes
           EOF
-          gh release create "$GITHUB_REF_NAME" \
+          gh release create "v$VERSION" \
             "build/$NAME" "build/$NAME.sha256" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Plainfile $VERSION" \
             --notes-file build/notes.md \
-            --generate-notes \
-            --verify-tag
+            --target "$GITHUB_SHA" \
+            --generate-notes
