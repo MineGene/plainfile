@@ -40,7 +40,8 @@ The build uses a pinned, checksum-verified XcodeGen (`scripts/install-xcodegen.s
 
 - The app and the parser service never get a network entitlement. `scripts/check-app.sh` fails the build if one appears.
 - File contents are only parsed inside `PlainfileParser`, which has no file-access entitlements. The app passes it bytes.
-- Use Apple frameworks (ImageIO, AVFoundation, PDFKit). Adding a third-party dependency needs a clear reason in the pull request.
+- **No third-party code in the app.** Use Apple frameworks (ImageIO, AVFoundation, PDFKit, Compression) only.
+- Keep build and test tools to a minimum. Any new one needs a stated reason in the pull request, an exact pinned version and a checksum, and must never ship inside the app.
 - Nothing about a user's files is written to disk or logged.
 - GitHub Actions are pinned to full commit SHAs. Dependabot proposes updates after a 7-day cooldown.
 

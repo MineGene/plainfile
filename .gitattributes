@@ -1,0 +1,3 @@
+# Build and CI helper scripts aren't part of the app; keep them out of
+# GitHub's language statistics so the repo shows the app's language.
+scripts/** linguist-detectable=false
