@@ -32,6 +32,7 @@ xcodebuild build \
   -derivedDataPath "$derived" \
   ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
   DEPLOYMENT_POSTPROCESSING=YES STRIP_INSTALLED_PRODUCT=YES COPY_PHASE_STRIP=YES \
+  GCC_GENERATE_DEBUGGING_SYMBOLS=NO DEBUG_INFORMATION_FORMAT=dwarf \
   COMPILER_INDEX_STORE_ENABLE=NO \
   OTHER_SWIFT_FLAGS="-file-prefix-map $derived=/DerivedData -file-prefix-map $root=/Source" \
   OTHER_LDFLAGS="-Wl,-oso_prefix,$root/" \
