@@ -32,10 +32,11 @@ public enum StripError: Error, Sendable, Equatable, CustomStringConvertible {
 /// was rather than re-written. The picture data is copied, never recompressed:
 /// formats ImageIO can't copy that way are refused instead of re-encoded.
 public enum ImageStripper {
-    /// Formats ImageIO can copy with new metadata and untouched image data.
+    /// Formats that come out fully clean with untouched image data. TIFF is
+    /// left out: ImageIO always rewrites its camera make, model and artist.
     public static let supportedTypes: Set<String> = [
-        UTType.jpeg.identifier, UTType.png.identifier, UTType.tiff.identifier,
-        UTType.heic.identifier, UTType.heif.identifier,
+        UTType.jpeg.identifier, UTType.png.identifier, UTType.heic.identifier,
+        UTType.heif.identifier,
     ]
 
     public static func strip(data: Data, removing ids: Set<String>) throws -> Data {
@@ -46,11 +47,11 @@ public enum ImageStripper {
         guard let source = CGImageSourceCreateWithData(data as CFData, sourceOptions),
             let type = CGImageSourceGetType(source)
         else { throw StripError.unreadable }
+        let count = CGImageSourceGetCount(source)
+        guard count == 1 else { throw StripError.multipleImages(count) }
         guard supportedTypes.contains(type as String) else {
             throw StripError.unsupportedType(type as String)
         }
-        let count = CGImageSourceGetCount(source)
-        guard count == 1 else { throw StripError.multipleImages(count) }
 
         // ImageIO doesn't remove PNG metadata when copying; drop the chunks instead.
         if type as String == UTType.png.identifier {

@@ -139,7 +139,14 @@ final class FormatTests: XCTestCase {
         XCTAssertTrue(try ImageComparator.pixelsMatch(input, output), "pixels changed", file: file, line: line)
     }
 
-    func testTIFF() throws { try assertDefaultStripCleans(.tiff) }
+    func testTIFFIsRefused() throws {
+        let input = try TestImages.planted(.tiff)
+        XCTAssertThrowsError(try ImageStripper.strip(data: input, removing: ["img0.{TIFF}.Make"])) { error in
+            guard case .unsupportedType = error as? StripError else {
+                return XCTFail("Expected unsupportedType, got \(error)")
+            }
+        }
+    }
     func testHEIC() throws { try assertDefaultStripCleans(.heic) }
 }
 
