@@ -23,7 +23,7 @@ public enum ImageScanner {
     ]
 
     /// Lower-cased property names that describe how pixels are stored.
-    static let structuralKeys: Set<String> = [
+    static let storageKeys: Set<String> = [
         "compression", "photometricinterpretation", "resolutionunit", "xresolution", "yresolution",
         "tilelength", "tilewidth", "headroom", "bitspersample", "samplesperpixel",
         "planarconfiguration", "rowsperstrip", "hasxmp", "pixelxdimension", "pixelydimension",
@@ -130,7 +130,7 @@ public enum ImageScanner {
         }
         if k == "orientation" { return (.other, .low, false) }
         // How the picture is stored; identifies nothing.
-        if structuralKeys.contains(k) { return (.other, .low, false) }
+        if storageKeys.contains(k) { return (.other, .low, false) }
         // Removing the colour space or gamma can change how colours display.
         if k == "colorspace" || k == "gamma" { return (.other, .low, false) }
         if k == "profilename" { return (.other, .low, false) }
