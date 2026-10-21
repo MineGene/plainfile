@@ -1,0 +1,46 @@
+name: Sensitive changes
+
+# Pull requests that change security-sensitive files (permissions, build
+# and release, the isolated file reader, AI instructions) need the
+# maintainer's review: the "maintainer-reviewed" label. A new push removes
+# the label, so the reviewed version is always the one that merges.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Maintainer review for sensitive files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # remove a stale review label after a new push
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: New push clears an earlier review
+        id: labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACTION: ${{ github.event.action }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ "$ACTION" = "synchronize" ] && [[ ",$LABELS," == *",maintainer-reviewed,"* ]]; then
+            gh pr edit "$NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label maintainer-reviewed
+            echo "New commits since the review; the label was removed."
+            LABELS=""
+          fi
+          echo "labels=$LABELS" >> "$GITHUB_OUTPUT"
+      - name: Check for sensitive files
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          LABELS: ${{ steps.labels.outputs.labels }}
+        run: scripts/check-sensitive.sh "$BASE" "$HEAD" "$LABELS"

@@ -9,8 +9,9 @@ Plainfile is a native macOS app (Swift, SwiftUI) that shows and removes hidden m
 - Turn off this environment's commit signing for the repo (`git config commit.gpgsign false`): its key isn't linked to the maintainer's account, so GitHub shows "Unverified". Squash-merge commits are signed by GitHub.
 - Stage files by name (`git add path/to/file`). Never use `git add -A`, `git add .` or `git commit -a`, and switch branches only with a clean working tree (`git status --short` empty): stray drafts have been swept into unrelated commits this way.
 - Run `scripts/check-commits.sh origin/main HEAD` before pushing.
-- One change per branch and pull request. Open the pull request yourself, then enable auto-merge (squash). Required checks: Commit privacy, Core tests (macos-26), Build and check app, Analyze Swift, Reproducible build.
+- One change per branch and pull request. Open the pull request yourself, then enable auto-merge (squash). Required checks: Commit privacy, Core tests (macos-26), Build and check app, Analyze Swift, Reproducible build, Maintainer review for sensitive files.
 - Never push to `main` or force-push it; it is protected.
+- **Never add, remove or edit the `maintainer-reviewed` label.** It is the maintainer's review of sensitive files (see CONTRIBUTING.md, Workflow). Your access to GitHub goes through the maintainer's account, so this rule is what keeps that review meaningful. When a pull request touches sensitive files, tell the maintainer which files and why, and wait.
 
 ## Building and testing
 
