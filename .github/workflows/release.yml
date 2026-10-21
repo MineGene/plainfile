@@ -66,9 +66,12 @@ jobs:
 
       - name: Record app digest
         id: digest
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          scripts/app-digest.sh build/Release/Plainfile.app > build/Plainfile-app-digest.txt
-          echo "sha=$(shasum -a 256 build/Plainfile-app-digest.txt | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          file="build/Plainfile-$VERSION-app-digest.txt"
+          scripts/app-digest.sh build/Release/Plainfile.app > "$file"
+          echo "sha=$(shasum -a 256 "$file" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
           echo "xcode=$(xcodebuild -version | head -n 1)" >> "$GITHUB_OUTPUT"
           echo "macos=$(sw_vers -productVersion)" >> "$GITHUB_OUTPUT"
 
@@ -91,7 +94,10 @@ jobs:
       - name: Attest build provenance
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
-          subject-path: build/Plainfile-${{ steps.version.outputs.version }}.dmg
+          # The DMG, and the app digest that binds the app inside it to this build.
+          subject-path: |
+            build/Plainfile-${{ steps.version.outputs.version }}.dmg
+            build/Plainfile-${{ steps.version.outputs.version }}-app-digest.txt
 
       - name: Publish GitHub Release
         env:
@@ -103,7 +109,6 @@ jobs:
           MACOS: ${{ steps.digest.outputs.macos }}
         run: |
           sha=$(cut -d' ' -f1 "build/$NAME.sha256")
-          cp build/Plainfile-app-digest.txt "build/Plainfile-$VERSION-app-digest.txt"
           cat > build/notes.md <<EOF
           ## Install
 
@@ -113,13 +118,16 @@ jobs:
 
           Only download Plainfile from this Releases page.
 
-          ## Verify your download (optional)
+          ## Verify it yourself (optional)
+
+          You don't have to trust this page, the maintainer or the AI that wrote the code. On a Mac, from a copy of the source:
 
           \`\`\`
-          shasum -a 256 $NAME
-          # should print: $sha
-          gh attestation verify $NAME --repo $GITHUB_REPOSITORY
+          scripts/verify-release.sh $VERSION            # checksum, signed build record, app contents, permissions
+          scripts/verify-release.sh $VERSION --rebuild  # also rebuild from source and compare
           \`\`\`
+
+          DMG SHA-256: \`$sha\`
 
           ## Rebuild it yourself (optional)
 

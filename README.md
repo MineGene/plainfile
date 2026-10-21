@@ -25,12 +25,15 @@ Items are grouped in plain language (Location, People and authorship, Device, Do
 
 Only download Plainfile from the Releases page above.
 
-**Check your download (optional).** Each release lists a SHA-256 checksum and is built by GitHub from this repository's public source, with a signed record of that build:
+**Verify it yourself (optional).** You don't need to trust this page, the maintainer, or the AI that wrote the code. Every release is built by GitHub from this public source, with a signed build record logged publicly by Sigstore, and builds are reproducible. One script checks it all:
 
 ```sh
-shasum -a 256 Plainfile-x.y.z.dmg
-gh attestation verify Plainfile-x.y.z.dmg --repo MineGene/plainfile
+git clone https://github.com/MineGene/plainfile.git && cd plainfile
+scripts/verify-release.sh 0.1.1            # checksum, signed build record, app contents, permissions
+scripts/verify-release.sh 0.1.1 --rebuild  # also rebuild from source and compare (needs the Xcode in .xcode-version)
 ```
+
+It confirms the DMG matches its checksum, that GitHub's signed record says this repository's release workflow built it, that the app inside matches that record file by file, and that the app has no network access. With `--rebuild` it builds the same source itself and checks you get exactly the same app.
 
 Requires macOS 15 or later on a Mac with Apple silicon (M1 or later). Intel Macs are not supported.
 

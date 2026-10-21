@@ -1,0 +1,43 @@
+name: Verify release
+
+# After every release, a fresh machine runs the same verification users run:
+# checksum, signed build record, app contents, permissions, and a full
+# rebuild from source that must give exactly the same app.
+on:
+  # Safe here: it runs only after Release, checks out main (not untrusted
+  # code), has a read-only token and only reads the public release.
+  workflow_run: # zizmor: ignore[dangerous-triggers]
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to verify, e.g. 0.1.1 (blank = latest)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pick version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION:-$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName)}"
+          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+      - name: Verify, including a rebuild from source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: scripts/verify-release.sh "$VERSION" --rebuild
