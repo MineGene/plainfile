@@ -22,6 +22,7 @@ The *Commit privacy* check enforces the email and trailer rules on every pull re
 1. Branch from `main`; one change per pull request.
 2. Push and open a pull request. CI builds the app, runs the tests, checks entitlements and commit privacy, and runs CodeQL. Nothing needs a Mac except writing code.
 3. Pull requests are squash-merged automatically once every required check passes (auto-merge). The maintainer can still review, hold or close any pull request.
+4. **Sensitive files need the maintainer's review.** Changes to permissions (`Config/`), workflows and scripts (`.github/`, `scripts/`), the Xcode project, the isolated file reader (`PlainfileParser/`, `ParserServiceProtocol.swift`), the pinned Xcode version, the compiled icon or `CLAUDE.md` wait until the maintainer adds the `maintainer-reviewed` label. A new push removes the label, so the reviewed version is the one that merges.
 
 `main` is protected: no direct pushes, force pushes or deletions.
 
