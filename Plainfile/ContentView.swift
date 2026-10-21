@@ -28,10 +28,10 @@ struct ContentView: View {
                 Button("Add Files", systemImage: "plus") { model.isImporting = true }
             }
         }
-        .dropDestination(for: URL.self) { urls, _ in
-            let fileURLs = urls.filter(\.isFileURL)
-            model.add(fileURLs)
-            return !fileURLs.isEmpty
+        // Files from Finder, and pictures dragged from other apps such as a
+        // browser, which arrive as image data rather than as a file.
+        .onDrop(of: [.fileURL, .image], isTargeted: nil) { providers in
+            model.handleDrop(providers)
         }
         .fileImporter(
             isPresented: $model.isImporting, allowedContentTypes: [.item],
