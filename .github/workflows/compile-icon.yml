@@ -1,0 +1,33 @@
+name: Compile icon
+
+# Compiles Design/AppIcon.icon with the pinned Xcode and commits the result
+# (Plainfile/Resources/Assets.car and AppIcon.icns) back to the branch that
+# was pushed. Runs only on branches named icon-compile/*, never on main.
+on:
+  push:
+    branches: ["icon-compile/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: macos-26
+    timeout-minutes: 20
+    permissions:
+      contents: write # push the compiled icon back to this branch
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # needed to push the result back
+      - name: Select pinned Xcode
+        run: scripts/select-xcode.sh
+      - name: Compile icon
+        run: scripts/compile-icon.sh
+      - name: Commit compiled icon
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898579+github-actions[bot]@users.noreply.github.com"
+          git add Plainfile/Resources/Assets.car Plainfile/Resources/AppIcon.icns
+          git commit -m "Compiled icon from Design/AppIcon.icon"
+          git push origin "HEAD:$GITHUB_REF_NAME"
