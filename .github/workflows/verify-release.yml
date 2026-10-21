@@ -4,7 +4,9 @@ name: Verify release
 # checksum, signed build record, app contents, permissions, and a full
 # rebuild from source that must give exactly the same app.
 on:
-  workflow_run:
+  # Safe here: it runs only after Release, checks out main (not untrusted
+  # code), has a read-only token and only reads the public release.
+  workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: [Release]
     types: [completed]
   workflow_dispatch:
