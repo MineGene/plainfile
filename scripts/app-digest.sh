@@ -11,6 +11,18 @@
 # Usage: scripts/app-digest.sh path/to/Plainfile.app
 set -euo pipefail
 
+# Assets.car contents, normalised: every image's checksum and properties,
+# minus the random IDs and timestamps Apple's asset compiler adds.
+normalised_assets() {
+  xcrun assetutil --info "$1" \
+    | grep -v -E '"(Timestamp|Key Format)"' \
+    | sed -E 's/[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}-[0-9]+-[0-9A-F]{16}/ID/g'
+}
+if [ "${1:-}" = "--assets" ]; then
+  normalised_assets "${2:?usage: app-digest.sh --assets path/to/Assets.car}"
+  exit 0
+fi
+
 app=$(cd "${1:?usage: app-digest.sh path/to/Plainfile.app}" && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -35,10 +47,7 @@ find . \( -type f -o -type l \) -print0 | LC_ALL=C sort -z |
       echo "link:$(readlink "$f")  $f"
     elif [ "$(basename "$f")" = "Assets.car" ]; then
       # Every image's own checksum and properties, minus random IDs and timestamps.
-      digest=$(xcrun assetutil --info "$f" \
-        | grep -v -E '"(Timestamp|Key Format)"' \
-        | sed -E 's/[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}-[0-9]+-[0-9A-F]{16}/ID/g' \
-        | shasum -a 256 | cut -d' ' -f1)
+      digest=$(normalised_assets "$f" | shasum -a 256 | cut -d' ' -f1)
       echo "assets:$digest  $f"
     else
       echo "$(shasum -a 256 "$f" | cut -d' ' -f1)  $f"
