@@ -30,6 +30,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Select pinned Xcode
+        run: scripts/select-xcode.sh
 
       # Pull requests that don't touch anything CodeQL analyses skip the scan
       # (the check still reports success). Main and the weekly run always scan.

@@ -56,7 +56,7 @@ Plainfile is an experiment in building a security-sensitive app with an AI doing
 - **Why the testing is layered:** an AI can make the same mistake in the code and in the tests that check it. So results are checked several independent ways: a fresh re-scan, a search of the cleaned file's raw bytes, a pixel-by-pixel picture comparison, and (planned) cross-checks with long-established tools such as ExifTool and mat2, real-world sample files, and tests that deliberately break the cleaner to prove the tests notice. The full plan is in [CONTRIBUTING.md](CONTRIBUTING.md#testing).
 - **What stays the same:** the safety design doesn't depend on the code being perfect. The app has no network access at all, and files are read in an isolated process that can't open other files.
 
-The first few commits had their AI attribution removed during an early clean-up; everything since says so openly.
+Every commit since `9ada525` carries the attribution itself. Six earlier commits on `main` were also written with Claude but lost the attribution during an early clean-up, and are listed here instead of rewriting history (which would break the link between releases and their source): `3a5ae97`, `00c21d8`, `4b5f320`, `914a697` (#4), `6f28c33` (#5) and `f7fb1ed` (#6). Only `c6e4b52`, the initial commit, was made without Claude.
 
 ## How it's built
 

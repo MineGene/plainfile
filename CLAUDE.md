@@ -7,6 +7,7 @@ Plainfile is a native macOS app (Swift, SwiftUI) that shows and removes hidden m
 - Commit as the maintainer, with the no-reply address: `git config user.name MineGene` and `git config user.email 187925417+MineGene@users.noreply.github.com`.
 - End each commit message with the standard `Co-Authored-By: Claude <noreply@anthropic.com>` attribution. Don't hide AI involvement anywhere.
 - Turn off this environment's commit signing for the repo (`git config commit.gpgsign false`): its key isn't linked to the maintainer's account, so GitHub shows "Unverified". Squash-merge commits are signed by GitHub.
+- Stage files by name (`git add path/to/file`). Never use `git add -A`, `git add .` or `git commit -a`, and switch branches only with a clean working tree (`git status --short` empty): stray drafts have been swept into unrelated commits this way.
 - Run `scripts/check-commits.sh origin/main HEAD` before pushing.
 - One change per branch and pull request. Open the pull request yourself, then enable auto-merge (squash). Required checks: Commit privacy, Core tests (macos-26), Build and check app, Analyze Swift.
 - Never push to `main` or force-push it; it is protected.
@@ -17,6 +18,8 @@ Plainfile is a native macOS app (Swift, SwiftUI) that shows and removes hidden m
 - Core logic lives in `Packages/PlainfileCore` with XCTest tests. Add tests for every behaviour change, using planted fake data (`TestImages`), never real personal files.
 - The Xcode project uses synchronized folders: new Swift files in `Plainfile/` or `PlainfileParser/` need no project edit.
 - The security scan (Analyze Swift) takes about 17 minutes when code changes; other checks take 1–3.
+- The app icon's source is `Design/AppIcon.icon` (Icon Composer). Apple's asset compiler isn't deterministic, so the compiled `Plainfile/Resources/Assets.car` and `AppIcon.icns` are committed. To change the icon: edit the source, push the branch as `icon-compile/<name>`, and the *Compile icon* workflow commits freshly compiled files back to that branch; bring them into the pull request.
+- Builds must stay reproducible: Xcode is pinned in `.xcode-version` (selected by `scripts/select-xcode.sh`), and the *Reproducible build* check builds twice at different paths and compares `scripts/app-digest.sh` output. Never add timestamps, absolute paths or run-specific values to the build.
 
 ## Rules the design depends on
 

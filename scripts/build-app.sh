@@ -5,10 +5,21 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version="${PLAINFILE_VERSION:-}"
-extra=()
-if [ -n "$version" ]; then
-  extra+=("MARKETING_VERSION=$version" "CURRENT_PROJECT_VERSION=${GITHUB_RUN_NUMBER:-1}")
+# The build must be reproducible: the same source gives the same app on any
+# machine (checked by scripts/check-reproducible.sh). So the build number
+# comes from the source (its commit count), not from the CI run, and paths
+# and timestamps are kept out of the binaries.
+root=$(pwd)
+derived="$root/build/DerivedData"
+export ZERO_AR_DATE=1
+# A fixed temporary folder: the compiler writes generated code (such as
+# macro expansions) there, and a random path would leak into the build.
+export TMPDIR=/tmp/plainfile-build
+rm -rf "$TMPDIR" && mkdir -p "$TMPDIR"
+build_number=$(git rev-list --count HEAD 2>/dev/null || echo 1)
+extra=("CURRENT_PROJECT_VERSION=$build_number")
+if [ -n "${PLAINFILE_VERSION:-}" ]; then
+  extra+=("MARKETING_VERSION=$PLAINFILE_VERSION")
 fi
 
 mkdir -p build
@@ -18,8 +29,13 @@ xcodebuild build \
   -scheme Plainfile \
   -configuration Release \
   -destination 'generic/platform=macOS' \
-  -derivedDataPath build/DerivedData \
+  -derivedDataPath "$derived" \
   ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
+  DEPLOYMENT_POSTPROCESSING=YES STRIP_INSTALLED_PRODUCT=YES COPY_PHASE_STRIP=YES \
+  GCC_GENERATE_DEBUGGING_SYMBOLS=NO DEBUG_INFORMATION_FORMAT=dwarf \
+  COMPILER_INDEX_STORE_ENABLE=NO \
+  OTHER_SWIFT_FLAGS="-file-prefix-map $derived=/DerivedData -file-prefix-map $root=/Source" \
+  OTHER_LDFLAGS="-Wl,-oso_prefix,$root/" \
   ${extra[@]+"${extra[@]}"} \
   > build/xcodebuild.log 2>&1
 status=$?
