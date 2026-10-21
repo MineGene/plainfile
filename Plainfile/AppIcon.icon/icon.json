@@ -1,32 +1,56 @@
 {
-  "fill" : {
-    "linear-gradient" : [
-      "srgb:0.180,0.330,0.960,1.00000",
-      "srgb:0.060,0.740,0.820,1.00000"
-    ],
-    "orientation" : {
-      "start" : { "x" : 0.5, "y" : 0 },
-      "stop" : { "x" : 0.5, "y" : 0.8 }
-    }
-  },
-  "groups" : [
+  "fill-specializations" : [
     {
-      "layers" : [
-        { "image-name" : "sparkle.svg", "name" : "sparkle", "glass" : true }
-      ],
-      "shadow" : { "kind" : "layer-color", "opacity" : 0.5 },
-      "translucency" : { "enabled" : true, "value" : 0.3 }
+      "value" : {
+        "linear-gradient" : [ "srgb:0.353,0.663,1.000,1.00000", "srgb:0.039,0.424,0.941,1.00000" ],
+        "orientation" : { "start" : { "x" : 0.5, "y" : 0 }, "stop" : { "x" : 0.5, "y" : 1 } }
+      }
     },
     {
-      "layers" : [
-        { "image-name" : "fold.svg", "name" : "fold" },
-        { "image-name" : "page.svg", "name" : "page", "glass" : true }
-      ],
-      "shadow" : { "kind" : "neutral", "opacity" : 0.5 },
-      "translucency" : { "enabled" : true, "value" : 0.4 }
+      "appearance" : "dark",
+      "value" : {
+        "linear-gradient" : [ "srgb:0.235,0.239,0.255,1.00000", "srgb:0.110,0.110,0.118,1.00000" ],
+        "orientation" : { "start" : { "x" : 0.5, "y" : 0 }, "stop" : { "x" : 0.5, "y" : 1 } }
+      }
     }
   ],
-  "supported-platforms" : {
-    "squares" : [ "macOS" ]
-  }
+  "groups" : [
+    {
+      "name" : "Lines",
+      "layers" : [
+        {
+          "image-name" : "lines.svg",
+          "name" : "lines",
+          "fill-specializations" : [
+            { "appearance" : "dark", "value" : { "solid" : "srgb:1.000,1.000,1.000,0.85000" } }
+          ]
+        }
+      ],
+      "shadow" : { "kind" : "none", "opacity" : 0 }
+    },
+    {
+      "name" : "Page",
+      "layers" : [
+        {
+          "image-name" : "fold.svg",
+          "name" : "fold",
+          "fill-specializations" : [
+            { "appearance" : "dark", "value" : { "solid" : "srgb:0.180,0.450,0.880,1.00000" } }
+          ]
+        },
+        {
+          "image-name" : "page.svg",
+          "name" : "page",
+          "glass" : true,
+          "fill-specializations" : [
+            { "appearance" : "dark", "value" : { "solid" : "srgb:0.300,0.600,1.000,1.00000" } }
+          ]
+        }
+      ],
+      "shadow" : { "kind" : "neutral", "opacity" : 0.5 },
+      "translucency" : { "enabled" : true, "value" : 0.3 },
+      "specular" : true
+    }
+  ],
+  "supported-platforms" : { "squares" : [ "macOS" ] }
 }
